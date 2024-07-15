@@ -41,11 +41,11 @@ def statement(invoice:Invoice, plays:dict) -> str:
                 raise Exception(f"Not supported genre: {play_for(performance).type}")
         return result
     
-    def total_amount_for():
-        total_amount = 0
+    def total_amount():
+        result = 0
         for perf in invoice.performances:
-            total_amount += amount_for(perf)
-        return total_amount
+            result += amount_for(perf)
+        return result
     
     def volume_credits_for(performance):
         result = 0
@@ -67,6 +67,6 @@ def statement(invoice:Invoice, plays:dict) -> str:
     for perf in invoice.performances:
         result += f"{play_for(perf).name} {usd(amount_for(perf))} ({perf.audience} seats)\n"
     
-    result += f"total: {usd(total_amount_for())}\n"
+    result += f"total: {usd(total_amount())}\n"
     result += f"volume credits: {total_volume_credits()} points"
     return result
