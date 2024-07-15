@@ -46,14 +46,13 @@ def statement(invoice:Invoice, plays:dict) -> str:
     result = f"invoice (customer : {invoice.customer})\n"
     
     for perf in invoice.performances:
-        play = play_for(perf)
-        this_amount = amount_for(perf, play)
+        this_amount = amount_for(perf, play_for(perf))
         
         volume_credits += max(perf.audience - 30, 0)
-        if play.type == "comedy":
+        if play_for(perf).type == "comedy":
             volume_credits += math.floor(perf.audience / 5)
             
-        result += f"{play.name} {this_amount // 100} ({perf.audience} seats)\n"
+        result += f"{play_for(perf).name} {this_amount // 100} ({perf.audience} seats)\n"
         total_amount += this_amount
     
     result += f"total: {total_amount // 100}\n"
