@@ -48,6 +48,9 @@ def statement(invoice:Invoice, plays:dict) -> str:
             result += math.floor(perf.audience / 5)
         return result
     
+    def usd(number):
+        return number // 100
+    
     total_amount = 0
     volume_credits = 0
     result = f"invoice (customer : {invoice.customer})\n"
@@ -55,9 +58,9 @@ def statement(invoice:Invoice, plays:dict) -> str:
     for perf in invoice.performances:
         volume_credits += volume_credits_for(perf)
             
-        result += f"{play_for(perf).name} {amount_for(perf) // 100} ({perf.audience} seats)\n"
+        result += f"{play_for(perf).name} {usd(amount_for(perf))} ({perf.audience} seats)\n"
         total_amount += amount_for(perf)
     
-    result += f"total: {total_amount // 100}\n"
+    result += f"total: {usd(total_amount)}\n"
     result += f"volume credits: {volume_credits} points"
     return result
