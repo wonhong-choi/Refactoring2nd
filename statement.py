@@ -64,7 +64,7 @@ def render_plain_text(data:dict, invoice:Invoice, plays:dict) -> str:
         return number // 100
     
     result = f"invoice (customer : {data['customer']})\n"
-    for perf in invoice.performances:
+    for perf in data['performances']:
         result += f"{play_for(perf).name} {usd(amount_for(perf))} ({perf.audience} seats)\n"
     
     result += f"total: {usd(total_amount())}\n"
@@ -76,4 +76,5 @@ def render_plain_text(data:dict, invoice:Invoice, plays:dict) -> str:
 def statement(invoice:Invoice, plays:dict) -> str:
     statemnet_data = {}
     statemnet_data["customer"] = invoice.customer
+    statemnet_data["performances"] = invoice.performances
     return render_plain_text(statemnet_data, invoice, plays)
