@@ -21,7 +21,7 @@ class Invoice:
         self.performances = performances
     
 
-def render_plain_text(invoice:Invoice, plays:dict) -> str:
+def render_plain_text(data:dict, invoice:Invoice, plays:dict) -> str:
     def play_for(performance):
         return plays[performance.play_id]
     
@@ -63,7 +63,7 @@ def render_plain_text(invoice:Invoice, plays:dict) -> str:
     def usd(number):
         return number // 100
     
-    result = f"invoice (customer : {invoice.customer})\n"
+    result = f"invoice (customer : {data['customer']})\n"
     for perf in invoice.performances:
         result += f"{play_for(perf).name} {usd(amount_for(perf))} ({perf.audience} seats)\n"
     
@@ -74,4 +74,6 @@ def render_plain_text(invoice:Invoice, plays:dict) -> str:
 
 
 def statement(invoice:Invoice, plays:dict) -> str:
-    return render_plain_text(invoice, plays)
+    statemnet_data = {}
+    statemnet_data["customer"] = invoice.customer
+    return render_plain_text(statemnet_data, invoice, plays)
