@@ -42,10 +42,11 @@ def statement(invoice:Invoice, plays:dict) -> str:
         return result
     
     def volume_credits_for(performance):
-        volume_credits = max(perf.audience - 30, 0)
-        if play_for(perf).type == "comedy":
-            volume_credits += math.floor(perf.audience / 5)
-        return volume_credits
+        result = 0
+        result += max(performance.audience - 30, 0)
+        if play_for(performance).type == "comedy":
+            result += math.floor(perf.audience / 5)
+        return result
     
     total_amount = 0
     volume_credits = 0
