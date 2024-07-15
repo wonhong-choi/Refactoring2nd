@@ -41,14 +41,18 @@ def statement(invoice:Invoice, plays:dict) -> str:
                 raise Exception(f"Not supported genre: {play_for(performance).type}")
         return result
     
+    def volume_credits_for(performance):
+        volume_credits = max(perf.audience - 30, 0)
+        if play_for(perf).type == "comedy":
+            volume_credits += math.floor(perf.audience / 5)
+        return volume_credits
+    
     total_amount = 0
     volume_credits = 0
     result = f"invoice (customer : {invoice.customer})\n"
     
     for perf in invoice.performances:
-        volume_credits += max(perf.audience - 30, 0)
-        if play_for(perf).type == "comedy":
-            volume_credits += math.floor(perf.audience / 5)
+        volume_credits += volume_credits_for(perf)
             
         result += f"{play_for(perf).name} {amount_for(perf) // 100} ({perf.audience} seats)\n"
         total_amount += amount_for(perf)
