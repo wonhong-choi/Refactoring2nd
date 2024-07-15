@@ -21,7 +21,7 @@ class Invoice:
         self.performances = performances
     
 
-def statement(invoice:Invoice, plays:dict) -> str:
+def render_plain_text(invoice:Invoice, plays:dict) -> str:
     def play_for(performance):
         return plays[performance.play_id]
     
@@ -70,3 +70,8 @@ def statement(invoice:Invoice, plays:dict) -> str:
     result += f"total: {usd(total_amount())}\n"
     result += f"volume credits: {total_volume_credits()} points"
     return result
+    
+
+
+def statement(invoice:Invoice, plays:dict) -> str:
+    return render_plain_text(invoice, plays)
