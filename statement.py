@@ -13,6 +13,9 @@ class Performance:
     def __init__(self, play_id, audience):
         self.play_id = play_id
         self.audience = audience
+    
+    def set_play(self, play):
+        self.play = play
         
 
 class Invoice:
@@ -22,12 +25,9 @@ class Invoice:
     
 
 def render_plain_text(data:dict, plays:dict) -> str:
-    def play_for(performance):
-        return plays[performance.play_id]
-    
     def amount_for(performance):
         result = 0
-        match play_for(performance).type:
+        match performance.play.type:
             case "tragedy":     # tragedy
                 result = 40000
                 if performance.audience > 30:
@@ -38,7 +38,7 @@ def render_plain_text(data:dict, plays:dict) -> str:
                     result += 10000 + 500 * (performance.audience - 20)
                 result += 300 * performance.audience
             case _:
-                raise Exception(f"Not supported genre: {play_for(performance).type}")
+                raise Exception(f"Not supported genre: {performance.play.type}")
         return result
     
     def total_amount():
@@ -50,7 +50,7 @@ def render_plain_text(data:dict, plays:dict) -> str:
     def volume_credits_for(performance):
         result = 0
         result += max(performance.audience - 30, 0)
-        if play_for(performance).type == "comedy":
+        if performance.play.type == "comedy":
             result += perf.audience // 5
         return result
     
@@ -65,16 +65,23 @@ def render_plain_text(data:dict, plays:dict) -> str:
     
     result = f"invoice (customer : {data['customer']})\n"
     for perf in data['performances']:
-        result += f"{play_for(perf).name} {usd(amount_for(perf))} ({perf.audience} seats)\n"
+        result += f"{perf.play.name} {usd(amount_for(perf))} ({perf.audience} seats)\n"
     
     result += f"total: {usd(total_amount())}\n"
     result += f"volume credits: {total_volume_credits()} points"
     return result
-    
-
 
 def statement(invoice:Invoice, plays:dict) -> str:
+    def play_for(performance):
+        return plays[performance.play_id]
+    
+    def enrich_performance(performance):
+        import copy
+        result = copy.copy(performance)
+        result.set_play(play_for(result))
+        return result
+    
     statemnet_data = {}
     statemnet_data["customer"] = invoice.customer
-    statemnet_data["performances"] = invoice.performances
+    statemnet_data["performances"] = list(map(enrich_performance, invoice.performances))
     return render_plain_text(statemnet_data, plays)
