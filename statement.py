@@ -25,7 +25,7 @@ def statement(invoice:Invoice, plays:dict) -> str:
     def play_for(performance):
         return plays[performance.play_id]
     
-    def amount_for(performance, play):
+    def amount_for(performance):
         result = 0
         match play_for(performance).type:
             case "tragedy":     # tragedy
@@ -46,7 +46,7 @@ def statement(invoice:Invoice, plays:dict) -> str:
     result = f"invoice (customer : {invoice.customer})\n"
     
     for perf in invoice.performances:
-        this_amount = amount_for(perf, play_for(perf))
+        this_amount = amount_for(perf)
         
         volume_credits += max(perf.audience - 30, 0)
         if play_for(perf).type == "comedy":
