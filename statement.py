@@ -17,6 +17,9 @@ class Performance:
     def set_play(self, play):
         self.play = play
         
+    def amount(self, amount):
+        self.amount = amount
+        
 
 class Invoice:
     def __init__(self, customer, performances):
@@ -25,26 +28,10 @@ class Invoice:
     
 
 def render_plain_text(data:dict, plays:dict) -> str:
-    def amount_for(performance):
-        result = 0
-        match performance.play.type:
-            case "tragedy":     # tragedy
-                result = 40000
-                if performance.audience > 30:
-                    result += 1000 * (performance.audience - 30)
-            case "comedy":      # comedy
-                result = 30000
-                if performance.audience > 20:
-                    result += 10000 + 500 * (performance.audience - 20)
-                result += 300 * performance.audience
-            case _:
-                raise Exception(f"Not supported genre: {performance.play.type}")
-        return result
-    
     def total_amount():
         result = 0
         for perf in data['performances']:
-            result += amount_for(perf)
+            result += perf.amount
         return result
     
     def volume_credits_for(performance):
@@ -65,7 +52,7 @@ def render_plain_text(data:dict, plays:dict) -> str:
     
     result = f"invoice (customer : {data['customer']})\n"
     for perf in data['performances']:
-        result += f"{perf.play.name} {usd(amount_for(perf))} ({perf.audience} seats)\n"
+        result += f"{perf.play.name} {usd(perf.amount)} ({perf.audience} seats)\n"
     
     result += f"total: {usd(total_amount())}\n"
     result += f"volume credits: {total_volume_credits()} points"
@@ -75,10 +62,27 @@ def statement(invoice:Invoice, plays:dict) -> str:
     def play_for(performance):
         return plays[performance.play_id]
     
+    def amount_for(performance):
+        result = 0
+        match performance.play.type:
+            case "tragedy":     # tragedy
+                result = 40000
+                if performance.audience > 30:
+                    result += 1000 * (performance.audience - 30)
+            case "comedy":      # comedy
+                result = 30000
+                if performance.audience > 20:
+                    result += 10000 + 500 * (performance.audience - 20)
+                result += 300 * performance.audience
+            case _:
+                raise Exception(f"Not supported genre: {performance.play.type}")
+        return result
+    
     def enrich_performance(performance):
         import copy
         result = copy.copy(performance)
         result.set_play(play_for(result))
+        result.amount(amount_for(result))
         return result
     
     statemnet_data = {}
