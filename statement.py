@@ -27,7 +27,7 @@ def statement(invoice:Invoice, plays:dict) -> str:
     
     def amount_for(performance, play):
         result = 0
-        match play.type:
+        match play_for(performance).type:
             case "tragedy":     # tragedy
                 result = 40000
                 if performance.audience > 30:
@@ -38,7 +38,7 @@ def statement(invoice:Invoice, plays:dict) -> str:
                     result += 10000 + 500 * (performance.audience - 20)
                 result += 300 * performance.audience
             case _:
-                raise Exception(f"Not supported genre: {play.type}")
+                raise Exception(f"Not supported genre: {play_for(performance).type}")
         return result
     
     total_amount = 0
