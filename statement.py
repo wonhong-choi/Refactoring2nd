@@ -22,18 +22,21 @@ class Invoice:
     
 
 def statement(invoice:Invoice, plays:dict) -> str:
-    def amount_for(perf, play):
+    def play_for(performance):
+        return plays[performance.play_id]
+    
+    def amount_for(performance, play):
         result = 0
         match play.type:
             case "tragedy":     # tragedy
                 result = 40000
-                if perf.audience > 30:
-                    result += 1000 * (perf.audience - 30)
+                if performance.audience > 30:
+                    result += 1000 * (performance.audience - 30)
             case "comedy":      # comedy
                 result = 30000
-                if perf.audience > 20:
-                    result += 10000 + 500 * (perf.audience - 20)
-                result += 300 * perf.audience
+                if performance.audience > 20:
+                    result += 10000 + 500 * (performance.audience - 20)
+                result += 300 * performance.audience
             case _:
                 raise Exception(f"Not supported genre: {play.type}")
         return result
@@ -43,7 +46,7 @@ def statement(invoice:Invoice, plays:dict) -> str:
     result = f"invoice (customer : {invoice.customer})\n"
     
     for perf in invoice.performances:
-        play = plays[perf.play_id]
+        play = play_for(perf)
         this_amount = amount_for(perf, play)
         
         volume_credits += max(perf.audience - 30, 0)
