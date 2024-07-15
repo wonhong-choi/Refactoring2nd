@@ -13,13 +13,6 @@ class Performance:
     def __init__(self, play_id, audience):
         self.play_id = play_id
         self.audience = audience
-    
-    def set_play(self, play):
-        self.play = play
-        
-    def amount(self, amount):
-        self.amount = amount
-        
 
 class Invoice:
     def __init__(self, customer, performances):
@@ -28,43 +21,30 @@ class Invoice:
     
 
 def render_plain_text(data:dict, plays:dict) -> str:
-    def total_amount():
-        result = 0
-        for perf in data['performances']:
-            result += perf.amount
-        return result
-    
-    def volume_credits_for(performance):
-        result = 0
-        result += max(performance.audience - 30, 0)
-        if performance.play.type == "comedy":
-            result += perf.audience // 5
-        return result
-    
-    def total_volume_credits():
-        result = -1 # something wrong ??
-        for perf in data['performances']:
-            result += volume_credits_for(perf)
-        return result
-    
     def usd(number):
         return number // 100
     
     result = f"invoice (customer : {data['customer']})\n"
     for perf in data['performances']:
-        result += f"{perf.play.name} {usd(perf.amount)} ({perf.audience} seats)\n"
+        result += f"{perf['play'].name} {usd(perf['amount'])} ({perf['audience']} seats)\n"
     
-    result += f"total: {usd(total_amount())}\n"
-    result += f"volume credits: {total_volume_credits()} points"
+    result += f"total: {usd(data['total_amount'])}\n"
+    result += f"volume credits: {data['total_volume_credits']} points"
     return result
 
 def statement(invoice:Invoice, plays:dict) -> str:
     def play_for(performance):
         return plays[performance.play_id]
     
+    def total_amount(data):
+        result = 0
+        for perf in data['performances']:
+            result += perf['amount']
+        return result
+    
     def amount_for(performance):
         result = 0
-        match performance.play.type:
+        match play_for(performance).type:
             case "tragedy":     # tragedy
                 result = 40000
                 if performance.audience > 30:
@@ -77,15 +57,38 @@ def statement(invoice:Invoice, plays:dict) -> str:
             case _:
                 raise Exception(f"Not supported genre: {performance.play.type}")
         return result
-    
-    def enrich_performance(performance):
-        import copy
-        result = copy.copy(performance)
-        result.set_play(play_for(result))
-        result.amount(amount_for(result))
+
+    def total_volume_credits(data):
+        result = 0
+        for perf in data['performances']:
+            result += perf["volume_credits"]
         return result
     
-    statemnet_data = {}
-    statemnet_data["customer"] = invoice.customer
-    statemnet_data["performances"] = list(map(enrich_performance, invoice.performances))
-    return render_plain_text(statemnet_data, plays)
+    def volume_credits_for(performance):
+        result = 0
+        result += max(performance.audience - 30, 0)
+        if play_for(performance).type == "comedy":
+            result += performance.audience // 5
+        return result
+    
+    def enrich_performance(performance):
+        result = {}
+        result["play_id"] = performance.play_id
+        result["audience"] = performance.audience
+        result["play"] = play_for(performance)
+        result["amount"] = amount_for(performance)
+        result["volume_credits"] = volume_credits_for(performance) 
+        return result
+    
+    statement_data = {}
+    statement_data["customer"] = invoice.customer
+    statement_data["performances"] = list(map(enrich_performance, invoice.performances))
+    statement_data["total_amount"] = total_amount(statement_data)
+    statement_data["total_volume_credits"] = total_volume_credits(statement_data)
+    
+    return render_plain_text(statement_data, plays)
+
+
+if __name__ == "__main__":
+    te = {"hello" : "hi"}
+    print(te.hello)
