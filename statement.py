@@ -21,7 +21,7 @@ class Invoice:
         self.performances = performances
     
 
-def render_plain_text(data:dict, invoice:Invoice, plays:dict) -> str:
+def render_plain_text(data:dict, plays:dict) -> str:
     def play_for(performance):
         return plays[performance.play_id]
     
@@ -43,7 +43,7 @@ def render_plain_text(data:dict, invoice:Invoice, plays:dict) -> str:
     
     def total_amount():
         result = 0
-        for perf in invoice.performances:
+        for perf in data['performances']:
             result += amount_for(perf)
         return result
     
@@ -56,7 +56,7 @@ def render_plain_text(data:dict, invoice:Invoice, plays:dict) -> str:
     
     def total_volume_credits():
         result = -1 # something wrong ??
-        for perf in invoice.performances:
+        for perf in data['performances']:
             result += volume_credits_for(perf)
         return result
     
@@ -77,4 +77,4 @@ def statement(invoice:Invoice, plays:dict) -> str:
     statemnet_data = {}
     statemnet_data["customer"] = invoice.customer
     statemnet_data["performances"] = invoice.performances
-    return render_plain_text(statemnet_data, invoice, plays)
+    return render_plain_text(statemnet_data, plays)
