@@ -22,7 +22,7 @@ class Invoice:
         self.performances = performances
     
 
-def render_plain_text(data:dict, plays:dict) -> str:
+def render_plain_text(data:dict) -> str:
     def usd(number):
         return number // 100
     
@@ -34,7 +34,7 @@ def render_plain_text(data:dict, plays:dict) -> str:
     result += f"volume credits: {data['total_volume_credits']} points"
     return result
 
-def statement(invoice:Invoice, plays:dict) -> str:
+def create_statement_data(invoice, plays):
     def play_for(performance):
         return plays[performance.play_id]
     
@@ -81,8 +81,10 @@ def statement(invoice:Invoice, plays:dict) -> str:
     statement_data["performances"] = list(map(enrich_performance, invoice.performances))
     statement_data["total_amount"] = total_amount(statement_data)
     statement_data["total_volume_credits"] = total_volume_credits(statement_data)
-    
-    return render_plain_text(statement_data, plays)
+    return statement_data
+
+def statement(invoice:Invoice, plays:dict) -> str:
+    return render_plain_text(create_statement_data(invoice, plays))
 
 
 if __name__ == "__main__":
