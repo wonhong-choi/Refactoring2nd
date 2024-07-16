@@ -1,5 +1,7 @@
 import locale
 import math
+from functools import reduce
+
 locale.setlocale(locale.LC_ALL, '')
 
 
@@ -37,10 +39,7 @@ def statement(invoice:Invoice, plays:dict) -> str:
         return plays[performance.play_id]
     
     def total_amount(data):
-        result = 0
-        for perf in data['performances']:
-            result += perf['amount']
-        return result
+        return reduce(lambda total, each : total + each['amount'], data['performances'], 0)
     
     def amount_for(performance):
         result = 0
@@ -59,10 +58,7 @@ def statement(invoice:Invoice, plays:dict) -> str:
         return result
 
     def total_volume_credits(data):
-        result = 0
-        for perf in data['performances']:
-            result += perf["volume_credits"]
-        return result
+        return reduce(lambda total, each : total + each['volume_credits'], data['performances'], 0)
     
     def volume_credits_for(performance):
         result = 0
