@@ -1,5 +1,11 @@
 from functools import reduce
 
+class PerformanceCalculator:
+    def __init__(self, performance, play) -> None:
+        self.performance = performance
+        self.play = play
+    
+
 def create_statement_data(invoice, plays):
     def play_for(performance):
         return plays[performance.play_id]
@@ -34,6 +40,7 @@ def create_statement_data(invoice, plays):
         return result
     
     def enrich_performance(performance):
+        performanceCalculator = PerformanceCalculator(performance, play_for(performance))
         result = {}
         result["play_id"] = performance.play_id
         result["audience"] = performance.audience

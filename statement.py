@@ -21,12 +21,12 @@ class Invoice:
     def __init__(self, customer, performances):
         self.customer = customer
         self.performances = performances
+
     
 def usd(number):
     return number // 100
 
 def render_plain_text(data:dict) -> str:
-    
     result = f"invoice (customer : {data['customer']})\n"
     for perf in data['performances']:
         result += f"{perf['play'].name} {usd(perf['amount'])} ({perf['audience']} seats)\n"
