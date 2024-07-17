@@ -28,6 +28,9 @@ class PerformanceCalculator:
             result += self.performance.audience // 5
         return result
     
+def create_performance_calculator(performance, play):
+    return PerformanceCalculator(performance, play)
+    
 
 def create_statement_data(invoice, plays):
     def play_for(performance):
@@ -40,7 +43,7 @@ def create_statement_data(invoice, plays):
         return reduce(lambda total, each : total + each['volume_credits'], data['performances'], 0)
     
     def enrich_performance(performance):
-        performanceCalculator = PerformanceCalculator(performance, play_for(performance))
+        performanceCalculator = create_performance_calculator(performance, play_for(performance))
         result = {}
         result["play_id"] = performance.play_id
         result["audience"] = performance.audience
