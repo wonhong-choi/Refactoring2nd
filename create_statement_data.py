@@ -21,6 +21,13 @@ class PerformanceCalculator:
                 raise Exception(f"Not supported genre: {self.play.type}")
         return result
     
+    def volume_credits(self):
+        result = 0
+        result += max(self.performance.audience - 30, 0)
+        if self.play.type == "comedy":
+            result += self.performance.audience // 5
+        return result
+    
 
 def create_statement_data(invoice, plays):
     def play_for(performance):
@@ -29,17 +36,8 @@ def create_statement_data(invoice, plays):
     def total_amount(data):
         return reduce(lambda total, each : total + each['amount'], data['performances'], 0)
     
-    
-
     def total_volume_credits(data):
         return reduce(lambda total, each : total + each['volume_credits'], data['performances'], 0)
-    
-    def volume_credits_for(performance):
-        result = 0
-        result += max(performance.audience - 30, 0)
-        if play_for(performance).type == "comedy":
-            result += performance.audience // 5
-        return result
     
     def enrich_performance(performance):
         performanceCalculator = PerformanceCalculator(performance, play_for(performance))
@@ -48,7 +46,7 @@ def create_statement_data(invoice, plays):
         result["audience"] = performance.audience
         result["play"] = performanceCalculator.play
         result["amount"] = performanceCalculator.amount()
-        result["volume_credits"] = volume_credits_for(performance) 
+        result["volume_credits"] = performanceCalculator.volume_credits() 
         return result
     
     statement_data = {}
