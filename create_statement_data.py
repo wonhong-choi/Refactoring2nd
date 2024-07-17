@@ -4,6 +4,22 @@ class PerformanceCalculator:
     def __init__(self, performance, play) -> None:
         self.performance = performance
         self.play = play
+        
+    def amount(self):
+        result = 0
+        match self.play.type:
+            case "tragedy":     # tragedy
+                result = 40000
+                if self.performance.audience > 30:
+                    result += 1000 * (self.performance.audience - 30)
+            case "comedy":      # comedy
+                result = 30000
+                if self.performance.audience > 20:
+                    result += 10000 + 500 * (self.performance.audience - 20)
+                result += 300 * self.performance.audience
+            case _:
+                raise Exception(f"Not supported genre: {self.play.type}")
+        return result
     
 
 def create_statement_data(invoice, plays):
@@ -13,21 +29,7 @@ def create_statement_data(invoice, plays):
     def total_amount(data):
         return reduce(lambda total, each : total + each['amount'], data['performances'], 0)
     
-    def amount_for(performance):
-        result = 0
-        match play_for(performance).type:
-            case "tragedy":     # tragedy
-                result = 40000
-                if performance.audience > 30:
-                    result += 1000 * (performance.audience - 30)
-            case "comedy":      # comedy
-                result = 30000
-                if performance.audience > 20:
-                    result += 10000 + 500 * (performance.audience - 20)
-                result += 300 * performance.audience
-            case _:
-                raise Exception(f"Not supported genre: {performance.play.type}")
-        return result
+    
 
     def total_volume_credits(data):
         return reduce(lambda total, each : total + each['volume_credits'], data['performances'], 0)
@@ -44,8 +46,8 @@ def create_statement_data(invoice, plays):
         result = {}
         result["play_id"] = performance.play_id
         result["audience"] = performance.audience
-        result["play"] = play_for(performance)
-        result["amount"] = amount_for(performance)
+        result["play"] = performanceCalculator.play
+        result["amount"] = performanceCalculator.amount()
         result["volume_credits"] = volume_credits_for(performance) 
         return result
     
