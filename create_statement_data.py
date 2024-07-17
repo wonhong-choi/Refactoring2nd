@@ -6,30 +6,47 @@ class PerformanceCalculator:
         self.play = play
         
     def amount(self):
-        result = 0
-        match self.play.type:
-            case "tragedy":     # tragedy
-                result = 40000
-                if self.performance.audience > 30:
-                    result += 1000 * (self.performance.audience - 30)
-            case "comedy":      # comedy
-                result = 30000
-                if self.performance.audience > 20:
-                    result += 10000 + 500 * (self.performance.audience - 20)
-                result += 300 * self.performance.audience
-            case _:
-                raise Exception(f"Not supported genre: {self.play.type}")
+        raise Exception(f"subclass will process")
+    
+    def volume_credits(self):
+        return max(self.performance.audience - 30, 0)
+        
+    
+class ComedyCalculator(PerformanceCalculator):
+    def __init__(self, performance, play):
+        super().__init__(performance, play)
+        
+    def amount(self):
+        result = 30000
+        if self.performance.audience > 20:
+            result += 10000 + 500 * (self.performance.audience - 20)
+        result += 300 * self.performance.audience
         return result
     
     def volume_credits(self):
-        result = 0
-        result += max(self.performance.audience - 30, 0)
-        if self.play.type == "comedy":
-            result += self.performance.audience // 5
+        return super().volume_credits() + self.performance.audience // 5
+
+
+class TragedyCalculator(PerformanceCalculator):
+    def __init__(self, performance, play):
+        super().__init__(performance, play)
+        
+    def amount(self):
+        result = 40000
+        if self.performance.audience > 30:
+            result += 1000 * (self.performance.audience - 30)
         return result
+        
+
     
 def create_performance_calculator(performance, play):
-    return PerformanceCalculator(performance, play)
+    match play.type:
+        case "comedy":
+            return ComedyCalculator(performance, play)
+        case "tragedy":
+            return TragedyCalculator(performance, play)
+        case _:
+            raise Exception(f"Not supported genre: {play.type}")
     
 
 def create_statement_data(invoice, plays):
